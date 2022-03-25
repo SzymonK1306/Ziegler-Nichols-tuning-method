@@ -13,7 +13,8 @@ window.iconphoto(True, icon)
 
 # radio buttons
 var = IntVar()
-Radiobutton(window, text="Heaviside step function", variable=var, value=0,).grid(row=0, column=1)
-Radiobutton(window, text="Sine function", variable=var, value=1,).grid(row=0, column=2)
+Radiobutton(window, text="Square signal", variable=var, value=0,).grid(row=0, column=0)
+Radiobutton(window, text="Heaviside step function", variable=var, value=1,).grid(row=0, column=1)
+Radiobutton(window, text="Sine function", variable=var, value=2,).grid(row=0, column=2)
 
 window.mainloop()
