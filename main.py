@@ -3,6 +3,8 @@ from PIL import ImageTk, Image
 from matplotlib import pyplot as plt    # lib for plots
 import numpy as np                      # lib for mathematical functions
 
+# GUI
+
 # creation the window
 window = Tk()
 window.geometry("900x600")
@@ -67,5 +69,34 @@ Label(parameters_frame, text="Integral time 'T':").grid(row=1, column=5)
 integral_time = Entry(parameters_frame, width=10)
 integral_time.insert(END, "1")
 integral_time.grid(row=2, column=5, padx=10)
+
+# MATHEMATICAL MODEL
+a = float(a_parameter.get())
+k = float(gain_k.get())
+T = float(integral_time.get())
+
+k_max = 2*a*a*a
+T_osc = 2*3.14/a
+
+# Ziegler-Nichols PI parameters
+k_ZN = 0.45*k_max
+T_ZN = 0.85*T_osc
+
+numerator_ZN = [0, 0, 0, k_ZN*T_ZN, k_ZN]
+denominator_ZN = [1, 2*a, a*a, k_ZN, k_ZN/T_ZN]
+
+A_ZN = [[0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+        [-k_ZN/T_ZN, -k_ZN, -a*a, -2*a]]
+B_ZN = [[0],
+        [0],
+        [0],
+        [1]]
+C_ZN = [k_ZN, k_ZN*T_ZN, 0, 0]
+
+print(A_ZN)
+print(B_ZN)
+print(C_ZN)
 
 window.mainloop()
