@@ -21,7 +21,7 @@ signal_frame.pack()
 parameters_title_frame = Frame(window)  # frame for the text on the parameters choice
 parameters_title_frame.pack()
 
-parameters_frame = Frame(window)
+parameters_frame = Frame(window)        # frame for parameters
 parameters_frame.pack()
 
 # window icon
@@ -45,22 +45,27 @@ Label(parameters_title_frame, text="Choose parameters:", font=("Arial", 15)).pac
 # Amplitude
 Label(parameters_frame, text="Amplitude:").grid(row=1, column=1)
 amplitude = Entry(parameters_frame, width=10)
+amplitude.insert(END, "1")
 amplitude.grid(row=2, column=1, padx=10)
 # Frequency
 Label(parameters_frame, text="Frequency:").grid(row=1, column=2)
 frequency = Entry(parameters_frame, width=10)
+frequency.insert(END, "1")
 frequency.grid(row=2, column=2, padx=10)
 # a parameter
 Label(parameters_frame, text="'a' parameter:").grid(row=1, column=3)
 a_parameter = Entry(parameters_frame, width=10)
+a_parameter.insert(END, "1")
 a_parameter.grid(row=2, column=3, padx=10)
 # gain 'k'
 Label(parameters_frame, text="gain 'k':").grid(row=1, column=4)
 gain_k = Entry(parameters_frame, width=10)
+gain_k.insert(END, "1")
 gain_k.grid(row=2, column=4, padx=10)
 # Integral time
 Label(parameters_frame, text="Integral time 'T':").grid(row=1, column=5)
 integral_time = Entry(parameters_frame, width=10)
+integral_time.insert(END, "1")
 integral_time.grid(row=2, column=5, padx=10)
 
 window.mainloop()
