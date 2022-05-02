@@ -3,6 +3,21 @@ from PIL import ImageTk, Image
 from matplotlib import pyplot as plt    # lib for plots
 import numpy as np                      # lib for mathematical functions
 
+
+# multiply matrices
+def multiply_matrices(mat1, mat2):
+        if len(mat1[0])!=len(mat2):     # checking matrix dimensions
+                print("Wrong matrices")
+        else:
+                result = [[0 for i in range(len(mat2[0]))] for j in range(len(mat1))]   # create empty matrix of result
+
+                for i in range(len(mat1)):      # rows of matrix 1
+                        for j in range(len(mat2[0])):   # columns of matrix 2
+                                for k in range(len(mat2)):      # iteration through rows and columns
+                                        result[i][j] += mat1[i][k] * mat2[k][j]
+                return result
+
+
 # GUI
 
 # creation the window
@@ -47,27 +62,27 @@ Label(parameters_title_frame, text="Choose parameters:", font=("Arial", 15)).pac
 # Amplitude
 Label(parameters_frame, text="Amplitude:").grid(row=1, column=1)
 amplitude = Entry(parameters_frame, width=10)
-amplitude.insert(END, "1")
+amplitude.insert(END, "1")      # default value
 amplitude.grid(row=2, column=1, padx=10)
 # Frequency
 Label(parameters_frame, text="Frequency:").grid(row=1, column=2)
 frequency = Entry(parameters_frame, width=10)
-frequency.insert(END, "1")
+frequency.insert(END, "1")      # default value
 frequency.grid(row=2, column=2, padx=10)
 # a parameter
 Label(parameters_frame, text="'a' parameter:").grid(row=1, column=3)
 a_parameter = Entry(parameters_frame, width=10)
-a_parameter.insert(END, "1")
+a_parameter.insert(END, "1")    # default value
 a_parameter.grid(row=2, column=3, padx=10)
 # gain 'k'
 Label(parameters_frame, text="gain 'k':").grid(row=1, column=4)
 gain_k = Entry(parameters_frame, width=10)
-gain_k.insert(END, "1")
+gain_k.insert(END, "1")         # default value
 gain_k.grid(row=2, column=4, padx=10)
 # Integral time
 Label(parameters_frame, text="Integral time 'T':").grid(row=1, column=5)
 integral_time = Entry(parameters_frame, width=10)
-integral_time.insert(END, "1")
+integral_time.insert(END, "1")    # default value
 integral_time.grid(row=2, column=5, padx=10)
 
 # MATHEMATICAL MODEL
@@ -94,9 +109,5 @@ B_ZN = [[0],
         [0],
         [1]]
 C_ZN = [k_ZN, k_ZN*T_ZN, 0, 0]
-
-print(A_ZN)
-print(B_ZN)
-print(C_ZN)
 
 window.mainloop()
