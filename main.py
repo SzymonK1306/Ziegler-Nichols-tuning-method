@@ -46,6 +46,116 @@ def multiply_matrix_scalar(mat, x):
 
     return result
 
+# choose signal by radio buttons
+def choose_signal(value):
+    global signal
+    if value == 0:
+        signal = "Square"
+        print(signal)
+    elif value == 1:
+        signal = "Heaviside"
+        print(signal)
+    elif value == 2:
+        signal = "Sine"
+        print(signal)
+
+
+# simulation function
+def simulation(zn_method):
+    # ----- Software -----
+
+    # Simulation parameters
+    t_stop = 20
+    t_sample = 0.01
+    t = np.arange(0, t_stop, t_sample)
+    N = int(np.ceil(t_stop / t_sample))
+
+    # Model parameters
+    a = float(a_parameter.get())
+    k = float(gain_k.get())
+    T = float(integral_time.get())
+
+    # PD parameters using Z-N method
+    if zn_method:
+        k_max = 2 * (a ** 3)
+        T_osc = 2 * np.pi / a
+        k = 0.45 * k_max
+        T = 0.85 * T_osc
+    else:
+        pass
+
+    # Input signals parameters
+    signal = "Square"  # default is square signal
+    amp = float(amplitude.get())
+    freq = float(frequency.get())
+    duty = 0.5  # ! Need to add to GUI
+
+    # Stability test
+    stability = True if 2 * a ** 3 > k else False
+
+    # State-space model
+    numerator = [0, 0, 0, k * T, k]
+    denominator = [1, 2 * a, a ** 2, k, k / T]
+
+    A = [[0, 1, 0, 0],
+         [0, 0, 1, 0],
+         [0, 0, 0, 1],
+         [-k / T, -k, -(a ** 2), -2 * a]]
+
+    B = [[0],
+         [0],
+         [0],
+         [1]]
+
+    C = [[k, k * T, 0, 0]]
+
+    # Input signals
+    u = [0 for i in range(N)]  # Input signal initialization
+
+    if signal == "Heaviside":
+        u = [amp for i in range(N)]
+    elif signal == "Square":
+        u = [amp if i <= (N - 1) * duty else -amp for i in range(N)]  # ! Need to edit
+    elif signal == "Sine":
+        u = [amp * np.sin(2 * np.pi * freq * i * t_sample) for i in range(N)]
+
+    # Simulation
+    y = [0 for i in range(N)]  # Output signal initialization
+    e = [0 for i in range(N)]  # Error signal initialization
+
+    xi_1 = [[0],  # Zero initial conditions
+            [0],
+            [0],
+            [0]]
+
+    for i in range(N):
+        Ax = multiply_matrices(A, xi_1)
+        Bu = multiply_matrix_scalar(B, u[0])
+        Cx = multiply_matrices(C, xi_1)
+
+        xi_1 = sum_matrices(xi_1, multiply_matrix_scalar(sum_matrices(Ax, Bu), t_sample))
+
+        y[i] = Cx[0][0]
+        e[i] = u[i] - y[i]
+
+    # ----- Plotting -----
+
+    '''
+    for i in range(N):
+        print(u[i])
+    '''
+
+    '''
+    for i in t:
+        print(i)
+    '''
+
+    '''
+    for i in range(N):
+        print(y[i])
+        # print(e)
+    '''
+
 
 # ----- GUI -----
 
@@ -70,6 +180,9 @@ parameters_title_frame.pack()
 parameters_frame = Frame(window)  # frame for parameters
 parameters_frame.pack()
 
+buttons_frame = Frame(window)   # frame for buttons
+buttons_frame.pack()
+
 # Window icon
 icon = PhotoImage(file='images/pid.png')
 window.iconphoto(True, icon)
@@ -82,9 +195,9 @@ schematic_label.pack()
 # Radio buttons
 var = IntVar()
 Label(signal_title_frame, text="Choose input signal:", font=("Arial", 15)).pack()
-Radiobutton(signal_frame, text="Square wave", variable=var, value=0, ).grid(row=0, column=1)
-Radiobutton(signal_frame, text="Heaviside step function", variable=var, value=1, ).grid(row=0, column=2)
-Radiobutton(signal_frame, text="Sine function", variable=var, value=2, ).grid(row=0, column=3)
+Radiobutton(signal_frame, text="Square wave", variable=var, value=0, command=lambda: choose_signal(0)).grid(row=0, column=1)
+Radiobutton(signal_frame, text="Heaviside step function", variable=var, value=1, command=lambda: choose_signal(1)).grid(row=0, column=2)
+Radiobutton(signal_frame, text="Sine function", variable=var, value=2, command=lambda: choose_signal(2)).grid(row=0, column=3)
 
 # Input fields
 Label(parameters_title_frame, text="Choose parameters:", font=("Arial", 15)).pack()
@@ -119,101 +232,12 @@ integral_time = Entry(parameters_frame, width=10)
 integral_time.insert(END, "1")  # default value
 integral_time.grid(row=2, column=5, padx=10)
 
-# ----- Software -----
+# start simulation
 
-# Simulation parameters
-t_stop = 20
-t_sample = 0.01
-t = np.arange(0, t_stop, t_sample)
-N = int(np.ceil(t_stop / t_sample))
+Button(buttons_frame, text="Simulation with your parameters", pady=5, padx=10, width=50, command=lambda: simulation(False)).grid(row=0, column=0)
+Label(buttons_frame, text="      ").grid(row=0, column=1)
+Button(buttons_frame, text="Simulation with Ziegler-Nichols parameters", pady=5, padx=10, width=50, command=lambda: simulation(True)).grid(row=0, column=2)
 
-# Model parameters
-a = float(a_parameter.get())
-k = float(gain_k.get())
-T = float(integral_time.get())
 
-# Other parameters
-zn_method = False  # ! Need to add to GUI
-
-# PD parameters using Z-N method
-if zn_method:
-    k_max = 2 * (a ** 3)
-    T_osc = 2 * np.pi / a
-    k = 0.45 * k_max
-    T = 0.85 * T_osc
-else:
-    pass
-
-# Input signals parameters
-signal = "Heaviside"  # "Heaviside" or "Square" or "Sine"  ->  ! Need to read from GUI
-amp = float(amplitude.get())
-freq = float(frequency.get())
-duty = 0.5  # ! Need to add to GUI
-
-# Stability test
-stability = True if 2 * a ** 3 > k else False
-
-# State-space model
-numerator = [0, 0, 0, k * T, k]
-denominator = [1, 2 * a, a ** 2, k, k / T]
-
-A = [[0, 1, 0, 0],
-     [0, 0, 1, 0],
-     [0, 0, 0, 1],
-     [-k / T, -k, -(a ** 2), -2 * a]]
-
-B = [[0],
-     [0],
-     [0],
-     [1]]
-
-C = [[k, k * T, 0, 0]]
-
-# Input signals
-u = [0 for i in range(N)]  # Input signal initialization
-
-if signal == "Heaviside":
-    u = [amp for i in range(N)]
-elif signal == "Square":
-    u = [amp if i <= (N - 1) * duty else -amp for i in range(N)]  # ! Need to edit
-elif signal == "Sine":
-    u = [amp * np.sin(2 * np.pi * freq * i * t_sample) for i in range(N)]
-
-# Simulation
-y = [0 for i in range(N)]  # Output signal initialization
-e = [0 for i in range(N)]  # Error signal initialization
-
-xi_1 = [[0],  # Zero initial conditions
-        [0],
-        [0],
-        [0]]
-
-for i in range(N):
-    Ax = multiply_matrices(A, xi_1)
-    Bu = multiply_matrix_scalar(B, u[0])
-    Cx = multiply_matrices(C, xi_1)
-
-    xi_1 = sum_matrices(xi_1, multiply_matrix_scalar(sum_matrices(Ax, Bu), t_sample))
-
-    y[i] = Cx[0][0]
-    e[i] = u[i] - y[i]
-
-# ----- Plotting -----
-
-'''
-for i in range(N):
-    print(u[i])
-'''
-
-'''
-for i in t:
-    print(i)
-'''
-
-'''
-for i in range(N):
-    print(y[i])
-    # print(e)
-'''
 
 window.mainloop()
