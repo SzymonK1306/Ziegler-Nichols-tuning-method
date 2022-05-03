@@ -18,10 +18,36 @@ def multiply_matrices(mat1, mat2):
             for j in range(len(mat2[0])):  # columns of matrix 2
                 for k in range(len(mat2)):  # iteration through rows and columns
                     result[i][j] += mat1[i][k] * mat2[k][j]
+
         return result
 
 
-# ----- GUI & Plotting -----
+# Matrix sum
+def sum_matrices(mat1, mat2):
+    if len(mat1[0]) != len(mat2[0]) or len(mat1) != len(mat2):  # checking matrix dimensions
+        print("Wrong matrices")
+    else:
+        result = [[0 for i in range(len(mat1[0]))] for j in range(len(mat1))]  # create empty matrix of result
+
+        for i in range(len(mat1)):  # rows
+            for j in range(len(mat1[0])):  # columns
+                result[i][j] = mat1[i][j] + mat2[i][j]
+
+        return result
+
+
+# Matrix and scalar multiplication
+def multiply_matrix_scalar(mat, x):
+    result = [[0 for i in range(len(mat[0]))] for j in range(len(mat))]  # create empty matrix of result
+
+    for i in range(len(mat)):  # rows
+        for j in range(len(mat[0])):  # columns
+            result[i][j] = mat[i][j] * x
+
+    return result
+
+
+# ----- GUI -----
 
 # Creating a window
 window = Tk()
@@ -93,12 +119,11 @@ integral_time = Entry(parameters_frame, width=10)
 integral_time.insert(END, "1")  # default value
 integral_time.grid(row=2, column=5, padx=10)
 
-
-# ----- Code -----
+# ----- Software -----
 
 # Simulation parameters
-t_stop = 1
-t_sample = 0.1
+t_stop = 20
+t_sample = 0.01
 t = np.arange(0, t_stop, t_sample)
 N = int(np.ceil(t_stop / t_sample))
 
@@ -120,7 +145,7 @@ else:
     pass
 
 # Input signals parameters
-signal = "Square"  # "Heaviside" or "Square" or "Sine"  ->  ! Need to read from GUI
+signal = "Heaviside"  # "Heaviside" or "Square" or "Sine"  ->  ! Need to read from GUI
 amp = float(amplitude.get())
 freq = float(frequency.get())
 duty = 0.5  # ! Need to add to GUI
@@ -145,17 +170,50 @@ B = [[0],
 C = [[k, k * T, 0, 0]]
 
 # Input signals
-u = [0 for i in range(N)]      # Input signal initialization
+u = [0 for i in range(N)]  # Input signal initialization
 
 if signal == "Heaviside":
     u = [amp for i in range(N)]
 elif signal == "Square":
-    u = [amp if i <= (N - 1) * duty else -amp for i in range(N)]            # ! Need to edit
+    u = [amp if i <= (N - 1) * duty else -amp for i in range(N)]  # ! Need to edit
 elif signal == "Sine":
     u = [amp * np.sin(2 * np.pi * freq * i * t_sample) for i in range(N)]
 
-# print(u)
+# Simulation
+y = [0 for i in range(N)]  # Output signal initialization
+e = [0 for i in range(N)]  # Error signal initialization
 
-# Simulation (output & error signals initialization and calculations)
+xi_1 = [[0],  # Zero initial conditions
+        [0],
+        [0],
+        [0]]
+
+for i in range(N):
+    Ax = multiply_matrices(A, xi_1)
+    Bu = multiply_matrix_scalar(B, u[0])
+    Cx = multiply_matrices(C, xi_1)
+
+    xi_1 = sum_matrices(xi_1, multiply_matrix_scalar(sum_matrices(Ax, Bu), t_sample))
+
+    y[i] = Cx[0][0]
+    e[i] = u[i] - y[i]
+
+# ----- Plotting -----
+
+'''
+for i in range(N):
+    print(u[i])
+'''
+
+'''
+for i in t:
+    print(i)
+'''
+
+'''
+for i in range(N):
+    print(y[i])
+    # print(e)
+'''
 
 window.mainloop()
