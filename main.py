@@ -108,6 +108,9 @@ B_ZN = [[0],
         [0],
         [0],
         [1]]
-C_ZN = [k_ZN, k_ZN*T_ZN, 0, 0]
+C_ZN = [[k_ZN, k_ZN*T_ZN, 0, 0]]
+
+m = multiply_matrices(C_ZN, B_ZN)
+print(m)
 
 window.mainloop()
