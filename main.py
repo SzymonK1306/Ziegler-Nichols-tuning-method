@@ -9,7 +9,7 @@ import math
 
 # definition of a system in the space of states
 def state_space(a, k, T, zn_method):
-    if (zn_method):
+    if zn_method:
         k_max = 2 * (a ** 3)
         T_osc = 2 * math.pi / a
         k = 0.45 * k_max
@@ -34,7 +34,7 @@ def state_space(a, k, T, zn_method):
 
 
 def stability_test(a, k):
-    if (2 * a ** 3 > k):
+    if 2 * a ** 3 > k:
         return True
     else:
         return False
@@ -48,7 +48,7 @@ def excitations(signal, total, duty_cycle, ampl, freq, period):
             u.append(ampl)
     elif signal == "Square":
         for i in range(total):
-            if (i < (total - 1) * duty_cycle):
+            if i < (total - 1) * duty_cycle:
                 u.append(ampl)
             else:
                 u.append(-ampl)
