@@ -1,10 +1,8 @@
 from tkinter import *  # lib for GUI
 from PIL import ImageTk, Image
 from matplotlib import pyplot as plt  # lib for plots
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
-                                               NavigationToolbar2Tk)
 import numpy as np  # lib for mathematical functions
+import math
 
 
 # ----- Functions -----
@@ -48,42 +46,28 @@ def multiply_matrix_scalar(mat, x):
 
     return result
 
-
-# Choosing signal using radio buttons
+# choose signal by radio buttons
 def choose_signal(value):
     global signal
-
     if value == 0:
         signal = "Square"
+        print(signal)
     elif value == 1:
         signal = "Heaviside"
+        print(signal)
     elif value == 2:
         signal = "Sine"
+        print(signal)
 
 
-# Plots function
-def plotting(x, z, time):
-    figure.clear()
-
-    toolbar = NavigationToolbar2Tk(figure_canvas, plots_frame)
-    toolbar.update()
-
-    figure_canvas.get_tk_widget().pack(side=BOTTOM, fill=BOTH, expand=1)
-
-    plot_x = figure.add_subplot()
-    plot_x.plot(time, x, color='C0')
-
-    # plot_z = figure.add_subplot()
-    # plot_z.plot(time, z, color='C1')
-
-
-# Simulation function
+# simulation function
 def simulation(zn_method):
+    # ----- Software -----
+
     # Simulation parameters
-    t_stop = 30
+    t_stop = 20
     t_sample = 0.01
     t = np.arange(0, t_stop, t_sample)
-
     N = int(np.ceil(t_stop / t_sample))
 
     # Model parameters
@@ -97,11 +81,9 @@ def simulation(zn_method):
         T_osc = 2 * np.pi / a
         k = 0.45 * k_max
         T = 0.85 * T_osc
-    else:
-        pass
 
     # Input signals parameters
-    signal = "Square"  # default is square signal
+    # signal = "Square"  # default is square signal
     amp = float(amplitude.get())
     freq = float(frequency.get())
     duty = 0.5  # ! Need to add to GUI
@@ -146,7 +128,7 @@ def simulation(zn_method):
 
     for i in range(N):
         Ax = multiply_matrices(A, xi_1)
-        Bu = multiply_matrix_scalar(B, u[i])
+        Bu = multiply_matrix_scalar(B, u[0])
         Cx = multiply_matrices(C, xi_1)
 
         xi_1 = sum_matrices(xi_1, multiply_matrix_scalar(sum_matrices(Ax, Bu), t_sample))
@@ -156,8 +138,24 @@ def simulation(zn_method):
 
     # ----- Plotting -----
 
-    plotting(y, e, t)
 
+    for i in range(N):
+        print(u[i])
+
+
+    '''
+    for i in t:
+        print(i)
+    '''
+
+    '''
+    for i in range(N):
+        print(y[i])
+        # print(e)
+    '''
+
+
+signal = "Square"
 
 # ----- GUI -----
 
@@ -182,11 +180,8 @@ parameters_title_frame.pack()
 parameters_frame = Frame(window)  # frame for parameters
 parameters_frame.pack()
 
-buttons_frame = Frame(window)  # frame for buttons
+buttons_frame = Frame(window)   # frame for buttons
 buttons_frame.pack()
-
-plots_frame = Frame(window)  # frame for plots
-plots_frame.pack()
 
 # Window icon
 icon = PhotoImage(file='images/pid.png')
@@ -200,12 +195,9 @@ schematic_label.pack()
 # Radio buttons
 var = IntVar()
 Label(signal_title_frame, text="Choose input signal:", font=("Arial", 15)).pack()
-Radiobutton(signal_frame, text="Square wave", variable=var, value=0, command=lambda: choose_signal(0)).grid(row=0,
-                                                                                                            column=1)
-Radiobutton(signal_frame, text="Heaviside step function", variable=var, value=1, command=lambda: choose_signal(1)).grid(
-    row=0, column=2)
-Radiobutton(signal_frame, text="Sine function", variable=var, value=2, command=lambda: choose_signal(2)).grid(row=0,
-                                                                                                              column=3)
+Radiobutton(signal_frame, text="Square wave", variable=var, value=0, command=lambda: choose_signal(0)).grid(row=0, column=1)
+Radiobutton(signal_frame, text="Heaviside step function", variable=var, value=1, command=lambda: choose_signal(1)).grid(row=0, column=2)
+Radiobutton(signal_frame, text="Sine function", variable=var, value=2, command=lambda: choose_signal(2)).grid(row=0, column=3)
 
 # Input fields
 Label(parameters_title_frame, text="Choose parameters:", font=("Arial", 15)).pack()
@@ -242,15 +234,11 @@ integral_time.grid(row=2, column=5, padx=10)
 
 # start simulation
 
-Button(buttons_frame, text="Simulation with your parameters", pady=5, padx=10, width=50,
-       command=lambda: simulation(False)).grid(row=0, column=0)
+Button(buttons_frame, text="Simulation with your parameters", pady=5, padx=10, width=50, command=lambda: simulation(False)).grid(row=0, column=0)
 Label(buttons_frame, text="      ").grid(row=0, column=1)
-Button(buttons_frame, text="Simulation with Ziegler-Nichols parameters", pady=5, padx=10, width=50,
-       command=lambda: simulation(True)).grid(row=0, column=2)
+Button(buttons_frame, text="Simulation with Ziegler-Nichols parameters", pady=5, padx=10, width=50, command=lambda: simulation(True)).grid(row=0, column=2)
 
-# plots
-figure = Figure(figsize=(5, 5), dpi=100)
-figure_canvas = FigureCanvasTkAgg(figure, master=plots_frame)
+
 
 
 window.mainloop()
