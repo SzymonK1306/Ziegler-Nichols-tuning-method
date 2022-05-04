@@ -252,4 +252,5 @@ Button(buttons_frame, text="Simulation with Ziegler-Nichols parameters", pady=5,
 figure = Figure(figsize=(5, 5), dpi=100)
 figure_canvas = FigureCanvasTkAgg(figure, master=plots_frame)
 
+
 window.mainloop()
