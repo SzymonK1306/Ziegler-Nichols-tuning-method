@@ -80,9 +80,9 @@ def plotting(x, z, time):
 # Simulation function
 def simulation(zn_method):
     # Simulation parameters
-    t_stop = 30
+    t_stop = 60
     t_sample = 0.01
-    t = np.arange(0, t_stop, t_sample)
+    t = np.arange(0, t_stop, t_sample, dtype=np.float64)
 
     N = int(np.ceil(t_stop / t_sample))
 
@@ -101,7 +101,6 @@ def simulation(zn_method):
         pass
 
     # Input signals parameters
-    # signal = "Square"  # default is square signal
     amp = float(amplitude.get())
     freq = float(frequency.get())
     duty = 0.5  # ! Need to add to GUI
@@ -158,7 +157,10 @@ def simulation(zn_method):
 
     plotting(y, e, t)
 
+
+# ----- Global Variables -----
 signal = "Square"
+
 # ----- GUI -----
 
 # Creating a window
@@ -251,6 +253,5 @@ Button(buttons_frame, text="Simulation with Ziegler-Nichols parameters", pady=5,
 # plots
 figure = Figure(figsize=(5, 5), dpi=100)
 figure_canvas = FigureCanvasTkAgg(figure, master=plots_frame)
-
 
 window.mainloop()
