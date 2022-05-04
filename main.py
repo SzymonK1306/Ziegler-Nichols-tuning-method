@@ -101,7 +101,7 @@ def simulation(zn_method):
         pass
 
     # Input signals parameters
-    signal = "Square"  # default is square signal
+    # signal = "Square"  # default is square signal
     amp = float(amplitude.get())
     freq = float(frequency.get())
     duty = 0.5  # ! Need to add to GUI
@@ -158,7 +158,7 @@ def simulation(zn_method):
 
     plotting(y, e, t)
 
-
+signal = "Square"
 # ----- GUI -----
 
 # Creating a window
