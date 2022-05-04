@@ -80,7 +80,7 @@ def plotting(x, z, time):
 # Simulation function
 def simulation(zn_method):
     # Simulation parameters
-    t_stop = 60
+    t_stop = 100
     t_sample = 0.01
     t = np.arange(0, t_stop, t_sample, dtype=np.float64)
 
@@ -109,7 +109,7 @@ def simulation(zn_method):
     stability = True if 2 * a ** 3 > k else False
 
     # State-space model
-    numerator = [0, 0, 0, k * T, k]
+    numerator = [0, 0, 0, k, k/T]
     denominator = [1, 2 * a, a ** 2, k, k / T]
 
     A = [[0, 1, 0, 0],
@@ -122,7 +122,7 @@ def simulation(zn_method):
          [0],
          [1]]
 
-    C = [[k, k * T, 0, 0]]
+    C = [[k/T, k, 0, 0]]
 
     # Input signals
     u = [0 for i in range(N)]  # Input signal initialization
@@ -130,7 +130,7 @@ def simulation(zn_method):
     if signal == "Heaviside":
         u = [amp for i in range(N)]
     elif signal == "Square":
-        u = [amp if i <= (N - 1) * duty else -amp for i in range(N)]  # ! Need to edit
+        u = [amp * np.sign(np.sin(2 * np.pi * freq * i * t_sample)) for i in range(N)]  # ! Need to edit
     elif signal == "Sine":
         u = [amp * np.sin(2 * np.pi * freq * i * t_sample) for i in range(N)]
 
@@ -157,10 +157,8 @@ def simulation(zn_method):
 
     plotting(y, e, t)
 
-
 # ----- Global Variables -----
 signal = "Square"
-
 # ----- GUI -----
 
 # Creating a window
@@ -253,5 +251,6 @@ Button(buttons_frame, text="Simulation with Ziegler-Nichols parameters", pady=5,
 # plots
 figure = Figure(figsize=(5, 5), dpi=100)
 figure_canvas = FigureCanvasTkAgg(figure, master=plots_frame)
+
 
 window.mainloop()
