@@ -212,7 +212,7 @@ icon = PhotoImage(file='images/pid.png')
 window.iconphoto(True, icon)
 
 # Images
-schematic = ImageTk.PhotoImage(Image.open("images/schematic.png").resize((350, 130)))
+schematic = ImageTk.PhotoImage(Image.open("images/schematic.png").resize((350, 82)))
 Label(img_frame, image=schematic).grid(row=0, column=0, columnspan=2)
 
 # Simulation parameters
