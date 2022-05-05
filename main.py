@@ -80,9 +80,12 @@ def plotting(x, z, time):
 # Simulation function
 def simulation(zn_method):
     # Simulation parameters
-    t_stop = 100
-    t_sample = 0.01
+    t_stop = float(simulation_time.get())
+    #t_stop = 100
+    t_sample = float(integration_step.get())
+    # t_sample = 0.01
     t = np.arange(0, t_stop, t_sample, dtype=np.float64)
+    stability = True
 
     N = int(np.ceil(t_stop / t_sample))
 
@@ -97,16 +100,13 @@ def simulation(zn_method):
         T_osc = 2 * np.pi / a
         k = 0.45 * k_max
         T = 0.85 * T_osc
-    else:
-        pass
+    elif (2 * a ** 3) < k or (2 * k * a ** 3 - k ** 2 - (2 * a * k)/T) < 0:    # stability test
+        stability = False
 
     # Input signals parameters
     amp = float(amplitude.get())
     freq = float(frequency.get())
     duty = 0.5  # ! Need to add to GUI
-
-    # Stability test
-    stability = True if 2 * a ** 3 > k else False
 
     # State-space model
     numerator = [0, 0, 0, k, k / T]
@@ -135,27 +135,34 @@ def simulation(zn_method):
         u = [amp * np.sin(2 * np.pi * freq * i * t_sample) for i in range(N)]
 
     # Simulation
-    y = [0 for i in range(N)]  # Output signal initialization
-    e = [0 for i in range(N)]  # Error signal initialization
+    if stability:
+        y = [0 for i in range(N)]  # Output signal initialization
+        e = [0 for i in range(N)]  # Error signal initialization
 
-    xi_1 = [[0],  # Zero initial conditions
+        xi_1 = [[0],  # Zero initial conditions
             [0],
             [0],
             [0]]
 
-    for i in range(N):
-        Ax = multiply_matrices(A, xi_1)
-        Bu = multiply_matrix_scalar(B, u[i])
-        Cx = multiply_matrices(C, xi_1)
+        for i in range(N):
+            Ax = multiply_matrices(A, xi_1)
+            Bu = multiply_matrix_scalar(B, u[i])
+            Cx = multiply_matrices(C, xi_1)
 
-        xi_1 = sum_matrices(xi_1, multiply_matrix_scalar(sum_matrices(Ax, Bu), t_sample))
+            xi_1 = sum_matrices(xi_1, multiply_matrix_scalar(sum_matrices(Ax, Bu), t_sample))
 
-        y[i] = Cx[0][0]
-        e[i] = u[i] - y[i]
+            y[i] = Cx[0][0]
+            e[i] = u[i] - y[i]
 
-    # ----- Plotting -----
+        # ----- Plotting -----
 
-    plotting(y, e, t)
+        plotting(y, e, t)
+
+    else:
+        stability_label = Label(plots_frame,
+                                text="The control system is unstable, change your parameters of PI regulator",
+                                font=("Arial", 20))
+        stability_label.pack()
 
 
 # ----- Global Variables -----
@@ -242,6 +249,18 @@ Label(parameters_frame, text="Integral time 'T':").grid(row=1, column=5)
 integral_time = Entry(parameters_frame, width=10)
 integral_time.insert(END, "1")  # default value
 integral_time.grid(row=2, column=5, padx=10)
+
+# integration step
+Label(parameters_frame, text="Integration step:").grid(row=1, column=6)
+integration_step = Entry(parameters_frame, width=10)
+integration_step.insert(END, "100")  # default value
+integration_step.grid(row=2, column=6, padx=10)
+
+# simulation time
+Label(parameters_frame, text="Simulation time:").grid(row=1, column=7)
+simulation_time = Entry(parameters_frame, width=10)
+simulation_time.insert(END, "0.01")  # default value
+simulation_time.grid(row=2, column=7, padx=10)
 
 # start simulation
 
