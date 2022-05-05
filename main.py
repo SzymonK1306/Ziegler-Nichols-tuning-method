@@ -63,28 +63,32 @@ def choose_signal(value):
 
 
 # Plots function
-def plotting(x, z, time):
-    figure = Figure(figsize=(5, 3), dpi=100)
-    plot_x = figure.add_subplot().plot(time, x, color='C0')
+def plotting(x, y, z, time):
+    figure_1 = Figure(figsize=(4, 3), dpi=100)
+    plot_1 = figure_1.add_subplot(111)
+    plot_1.plot(time, x, color='C0')
+    plot_1.plot(time, y, color='C1')
 
-    chart = FigureCanvasTkAgg(figure, master=plots_frame)
+    chart = FigureCanvasTkAgg(figure_1, master=plots_frame)
     chart.get_tk_widget().grid(pady=6, row=0, column=0)
+
+    figure_2 = Figure(figsize=(4, 3), dpi=100)
+    plot_2 = figure_2.add_subplot(111)
+    plot_2.plot(time, z, color='C2')
+
+    chart = FigureCanvasTkAgg(figure_2, master=plots_frame)
+    chart.get_tk_widget().grid(pady=6, row=0, column=1)
 
     # toolbar = NavigationToolbar2Tk(chart, plots_frame)
     # toolbar.get_tk_widget().pack()
     # toolbar.update()
-
-    # plot_z = figure.add_subplot()
-    # plot_z.plot(time, z, color='C1')
 
 
 # Simulation function
 def simulation(zn_method):
     # Simulation parameters
     t_stop = float(simulation_time.get())
-    #t_stop = 100
     t_sample = float(integration_step.get())
-    # t_sample = 0.01
     t = np.arange(0, t_stop, t_sample, dtype=np.float64)
     stability = True
 
@@ -157,7 +161,7 @@ def simulation(zn_method):
 
         # ----- Plotting -----
 
-        plotting(y, e, t)
+        plotting(u, y, e, t)
 
     else:
         messagebox.showinfo("Stability", "The control system is unstable, change parameters of PI regulator")
