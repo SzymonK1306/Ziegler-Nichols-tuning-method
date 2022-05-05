@@ -1,5 +1,6 @@
 from tkinter import *  # lib for GUI
 from PIL import ImageTk, Image
+from tkinter import messagebox
 from matplotlib import pyplot as plt  # lib for plots
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
@@ -159,10 +160,7 @@ def simulation(zn_method):
         plotting(y, e, t)
 
     else:
-        stability_label = Label(plots_frame,
-                                text="The control system is unstable, change your parameters of PI regulator",
-                                font=("Arial", 20))
-        stability_label.pack()
+        messagebox.showinfo("Stability", "The control system is unstable, change parameters of PI regulator")
 
 
 # ----- Global Variables -----
