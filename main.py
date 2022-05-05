@@ -63,15 +63,15 @@ def choose_signal(value):
 
 # Plots function
 def plotting(x, z, time):
-    figure.clear()
+    figure = Figure(figsize=(5, 3), dpi=100)
+    plot_x = figure.add_subplot().plot(time, x, color='C0')
 
-    toolbar = NavigationToolbar2Tk(figure_canvas, plots_frame)
-    toolbar.update()
+    chart = FigureCanvasTkAgg(figure, master=plots_frame)
+    chart.get_tk_widget().grid(pady=6, row=0, column=0)
 
-    figure_canvas.get_tk_widget().pack(side=BOTTOM, fill=BOTH, expand=1)
-
-    plot_x = figure.add_subplot()
-    plot_x.plot(time, x, color='C0')
+    # toolbar = NavigationToolbar2Tk(chart, plots_frame)
+    # toolbar.get_tk_widget().pack()
+    # toolbar.update()
 
     # plot_z = figure.add_subplot()
     # plot_z.plot(time, z, color='C1')
@@ -109,7 +109,7 @@ def simulation(zn_method):
     stability = True if 2 * a ** 3 > k else False
 
     # State-space model
-    numerator = [0, 0, 0, k, k/T]
+    numerator = [0, 0, 0, k, k / T]
     denominator = [1, 2 * a, a ** 2, k, k / T]
 
     A = [[0, 1, 0, 0],
@@ -122,7 +122,7 @@ def simulation(zn_method):
          [0],
          [1]]
 
-    C = [[k/T, k, 0, 0]]
+    C = [[k / T, k, 0, 0]]
 
     # Input signals
     u = [0 for i in range(N)]  # Input signal initialization
@@ -157,13 +157,16 @@ def simulation(zn_method):
 
     plotting(y, e, t)
 
+
 # ----- Global Variables -----
 signal = "Square"
+
+
 # ----- GUI -----
 
 # Creating a window
 window = Tk()
-window.geometry("900x600")
+window.geometry("900x650")
 window.title("Ziegler–Nichols tuning method")
 
 # Creating frames
@@ -247,10 +250,5 @@ Button(buttons_frame, text="Simulation with your parameters", pady=5, padx=10, w
 Label(buttons_frame, text="      ").grid(row=0, column=1)
 Button(buttons_frame, text="Simulation with Ziegler-Nichols parameters", pady=5, padx=10, width=50,
        command=lambda: simulation(True)).grid(row=0, column=2)
-
-# plots
-figure = Figure(figsize=(5, 5), dpi=100)
-figure_canvas = FigureCanvasTkAgg(figure, master=plots_frame)
-
 
 window.mainloop()
