@@ -3,8 +3,7 @@ from PIL import ImageTk, Image
 from tkinter import messagebox
 from matplotlib import pyplot as plt  # lib for plots
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
-                                               NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 import numpy as np  # lib for mathematical functions
 
 
@@ -64,23 +63,28 @@ def choose_signal(value):
 
 # Plots function
 def plotting(x, y, z, time):
-    figure_1 = Figure(figsize=(4, 3), dpi=100)
+    figure_1 = Figure(figsize=(4, 2), dpi=120)
     plot_1 = figure_1.add_subplot(111)
+    plot_1.set_title('Input and output signals u(t) and y(t)')
+
     plot_1.plot(time, x, color='C0')
     plot_1.plot(time, y, color='C1')
 
-    chart = FigureCanvasTkAgg(figure_1, master=plots_frame)
-    chart.get_tk_widget().grid(pady=6, row=0, column=0)
+    chart_1 = FigureCanvasTkAgg(figure_1, master=plots_frame)
+    chart_1.get_tk_widget().grid(row=1, column=0)
 
-    figure_2 = Figure(figsize=(4, 3), dpi=100)
+    figure_2 = Figure(figsize=(4, 2), dpi=120)
     plot_2 = figure_2.add_subplot(111)
-    plot_2.plot(time, z, color='C2')
+    plot_2.set_title('Error signal e(t)')
 
-    chart = FigureCanvasTkAgg(figure_2, master=plots_frame)
-    chart.get_tk_widget().grid(pady=6, row=0, column=1)
+    plot_2.plot(time, z, color='C2')
+    plot_2.set_xlabel('Time')
+
+    chart_2 = FigureCanvasTkAgg(figure_2, master=plots_frame)
+    chart_2.get_tk_widget().grid(row=2, column=0)
 
     # toolbar = NavigationToolbar2Tk(chart, plots_frame)
-    # toolbar.get_tk_widget().pack()
+    # toolbar.pack()
     # toolbar.update()
 
 
@@ -94,24 +98,23 @@ def simulation(zn_method):
 
     N = int(np.ceil(t_stop / t_sample))
 
-    # Model parameters
+    # System parameters
     a = float(a_parameter.get())
     k = float(gain_k.get())
     T = float(integral_time.get())
 
-    # PD parameters using Z-N method
+    # PI parameters using Z-N method
     if zn_method:
         k_max = 2 * (a ** 3)
         T_osc = 2 * np.pi / a
         k = 0.45 * k_max
         T = 0.85 * T_osc
-    elif (2 * a ** 3) < k or (2 * k * a ** 3 - k ** 2 - (2 * a * k)/T) < 0:    # stability test
+    elif (2 * a ** 3) < k or (2 * k * a ** 3 - k ** 2 - (2 * a * k) / T) < 0:  # stability test
         stability = False
 
     # Input signals parameters
     amp = float(amplitude.get())
     freq = float(frequency.get())
-    duty = 0.5  # ! Need to add to GUI
 
     # State-space model
     numerator = [0, 0, 0, k, k / T]
@@ -145,9 +148,9 @@ def simulation(zn_method):
         e = [0 for i in range(N)]  # Error signal initialization
 
         xi_1 = [[0],  # Zero initial conditions
-            [0],
-            [0],
-            [0]]
+                [0],
+                [0],
+                [0]]
 
         for i in range(N):
             Ax = multiply_matrices(A, xi_1)
@@ -160,7 +163,6 @@ def simulation(zn_method):
             e[i] = u[i] - y[i]
 
         # ----- Plotting -----
-
         plotting(u, y, e, t)
 
     else:
@@ -170,106 +172,118 @@ def simulation(zn_method):
 # ----- Global Variables -----
 signal = "Square"
 
-
 # ----- GUI -----
 
 # Creating a window
 window = Tk()
-window.geometry("900x650")
+window.geometry("1100x550")
 window.title("Ziegler–Nichols tuning method")
 
 # Creating frames
-image_frame = Frame(window)  # frame for image
-image_frame.pack()
+left_frame = Frame(window)  # left side frame
+left_frame.pack(side=LEFT, fill=BOTH, expand=True)
 
-signal_title_frame = Frame(window)  # frame for text when selecting a signal
-signal_title_frame.pack()
+right_frame = Frame(window)  # right side frame
+right_frame.pack(side=RIGHT, fill=BOTH, expand=True)
 
-signal_frame = Frame(window)  # frame for signals to choose
-signal_frame.pack()
-
-parameters_title_frame = Frame(window)  # frame for text when selecting parameters
-parameters_title_frame.pack()
-
-parameters_frame = Frame(window)  # frame for parameters
-parameters_frame.pack()
-
-buttons_frame = Frame(window)  # frame for buttons
-buttons_frame.pack()
-
-plots_frame = Frame(window)  # frame for plots
+plots_frame = Frame(right_frame)  # frame for plots
 plots_frame.pack()
+
+img_frame = Frame(left_frame)  # frame for image
+img_frame.pack()
+
+sim_param_frame = Frame(left_frame)  # frame for simulation parameters
+sim_param_frame.pack()
+
+syst_param_frame = Frame(left_frame)  # frame for system parameters
+syst_param_frame.pack()
+
+input_signal_frame = Frame(left_frame)  # frame for input signals
+input_signal_frame.pack()
+
+input_param_frame = Frame(left_frame)  # frame for input signal parameters
+input_param_frame.pack()
+
+start_sim_buttons_frame = Frame(left_frame)  # frame for start simulation buttons
+start_sim_buttons_frame.pack()
 
 # Window icon
 icon = PhotoImage(file='images/pid.png')
 window.iconphoto(True, icon)
 
 # Images
-schematic = ImageTk.PhotoImage(Image.open("images/schematic.png"))
-schematic_label = Label(image_frame, image=schematic)
-schematic_label.pack()
+schematic = ImageTk.PhotoImage(Image.open("images/schematic.png").resize((350, 130)))
+Label(img_frame, image=schematic).grid(row=0, column=0, columnspan=2)
 
-# Radio buttons
-var = IntVar()
-Label(signal_title_frame, text="Choose input signal:", font=("Arial", 15)).pack()
-Radiobutton(signal_frame, text="Square wave", variable=var, value=0, command=lambda: choose_signal(0)).grid(row=0,
-                                                                                                            column=1)
-Radiobutton(signal_frame, text="Heaviside step function", variable=var, value=1, command=lambda: choose_signal(1)).grid(
-    row=0, column=2)
-Radiobutton(signal_frame, text="Sine function", variable=var, value=2, command=lambda: choose_signal(2)).grid(row=0,
-                                                                                                              column=3)
-
-# Input fields
-Label(parameters_title_frame, text="Choose parameters:", font=("Arial", 15)).pack()
-
-# amplitude
-Label(parameters_frame, text="Amplitude:").grid(row=1, column=1)
-amplitude = Entry(parameters_frame, width=10)
-amplitude.insert(END, "1")  # default value
-amplitude.grid(row=2, column=1, padx=10)
-
-# frequency
-Label(parameters_frame, text="Frequency:").grid(row=1, column=2)
-frequency = Entry(parameters_frame, width=10)
-frequency.insert(END, "1")  # default value
-frequency.grid(row=2, column=2, padx=10)
-
-# 'a' parameter
-Label(parameters_frame, text="'a' parameter:").grid(row=1, column=3)
-a_parameter = Entry(parameters_frame, width=10)
-a_parameter.insert(END, "1")  # default value
-a_parameter.grid(row=2, column=3, padx=10)
-
-# gain 'k'
-Label(parameters_frame, text="gain 'k':").grid(row=1, column=4)
-gain_k = Entry(parameters_frame, width=10)
-gain_k.insert(END, "1")  # default value
-gain_k.grid(row=2, column=4, padx=10)
-
-# integral time 'T'
-Label(parameters_frame, text="Integral time 'T':").grid(row=1, column=5)
-integral_time = Entry(parameters_frame, width=10)
-integral_time.insert(END, "1")  # default value
-integral_time.grid(row=2, column=5, padx=10)
-
-# integration step
-Label(parameters_frame, text="Integration step:").grid(row=1, column=6)
-integration_step = Entry(parameters_frame, width=10)
-integration_step.insert(END, "0.01")  # default value
-integration_step.grid(row=2, column=6, padx=10)
+# Simulation parameters
+Label(sim_param_frame, text="Enter simulation parameters", font=("Arial", 13)).grid(row=1, column=0, columnspan=2)
 
 # simulation time
-Label(parameters_frame, text="Simulation time:").grid(row=1, column=7)
-simulation_time = Entry(parameters_frame, width=10)
+Label(sim_param_frame, text="Simulation time: ").grid(row=2, column=0)
+simulation_time = Entry(sim_param_frame, width=10)
 simulation_time.insert(END, "100")  # default value
-simulation_time.grid(row=2, column=7, padx=10)
+simulation_time.grid(row=2, column=1, sticky=W)
 
-# start simulation
+# integration step
+Label(sim_param_frame, text="Integration step: ").grid(row=3, column=0)
+integration_step = Entry(sim_param_frame, width=10)
+integration_step.insert(END, "0.01")  # default value
+integration_step.grid(row=3, column=1, sticky=W)
 
-Button(buttons_frame, text="Simulation with your parameters", pady=5, padx=10, width=50,
-       command=lambda: simulation(False)).grid(row=0, column=0)
-Label(buttons_frame, text="      ").grid(row=0, column=1)
-Button(buttons_frame, text="Simulation with Ziegler-Nichols parameters", pady=5, padx=10, width=50,
-       command=lambda: simulation(True)).grid(row=0, column=2)
+# System parameters
+Label(syst_param_frame, text="Enter system parameters", font=("Arial", 13)).grid(row=4, column=0, columnspan=2)
+
+# parameter 'a'
+Label(syst_param_frame, text="Parameter 'a': ").grid(row=5, column=0, sticky=W)
+a_parameter = Entry(syst_param_frame, width=10)
+a_parameter.insert(END, "2")  # default value
+a_parameter.grid(row=5, column=1, sticky=W)
+
+# gain 'k'
+Label(syst_param_frame, text="Gain 'k': ").grid(row=6, column=0, sticky=W)
+gain_k = Entry(syst_param_frame, width=10)
+gain_k.insert(END, "10")  # default value
+gain_k.grid(row=6, column=1, sticky=W)
+
+# integral time 'T'
+Label(syst_param_frame, text="Integral time 'T': ").grid(row=7, column=0, sticky=W)
+integral_time = Entry(syst_param_frame, width=10)
+integral_time.insert(END, "4")  # default value
+integral_time.grid(row=7, column=1, sticky=W)
+
+# Input signals
+var = IntVar()
+Label(input_signal_frame, text="Choose input signal", font=("Arial", 13)).grid(row=8, column=0)
+Radiobutton(input_signal_frame, text="Square wave", variable=var, value=0,
+            command=lambda: choose_signal(0)).grid(row=9, column=0, sticky=W)
+Radiobutton(input_signal_frame, text="Heaviside step function", variable=var, value=1,
+            command=lambda: choose_signal(1)).grid(row=10, column=0, sticky=W)
+Radiobutton(input_signal_frame, text="Sine function", variable=var, value=2,
+            command=lambda: choose_signal(2)).grid(row=11, column=0, sticky=W)
+
+# Input signal parameters
+Label(input_param_frame, text="Enter input parameters", font=("Arial", 13)).grid(row=12, column=0, columnspan=2)
+
+# amplitude
+Label(input_param_frame, text="Amplitude: ").grid(row=13, column=0, sticky=W)
+amplitude = Entry(input_param_frame, width=10)
+amplitude.insert(END, "1")  # default value
+amplitude.grid(row=13, column=1, sticky=W)
+
+# frequency
+Label(input_param_frame, text="Frequency: ").grid(row=14, column=0, sticky=W)
+frequency = Entry(input_param_frame, width=10)
+frequency.insert(END, "0.1")  # default value
+frequency.grid(row=14, column=1, sticky=W)
+
+# Start simulation
+Label(input_param_frame, text="Simulate with", font=("Arial", 13)).grid(row=15, column=0, columnspan=2)
+Button(start_sim_buttons_frame, text="Your parameters", pady=4, width=20,
+       command=lambda: simulation(False)).grid(row=16, column=0, sticky=W)
+Button(start_sim_buttons_frame, text="Ziegler-Nichols parameters", pady=4, width=20,
+       command=lambda: simulation(True)).grid(row=16, column=1, sticky=E)
+
+# Plotting
+Label(plots_frame, text="Plots", font=("Arial", 13)).grid(row=0, column=0)
 
 window.mainloop()
