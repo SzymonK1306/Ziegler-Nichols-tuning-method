@@ -253,13 +253,13 @@ integral_time.grid(row=2, column=5, padx=10)
 # integration step
 Label(parameters_frame, text="Integration step:").grid(row=1, column=6)
 integration_step = Entry(parameters_frame, width=10)
-integration_step.insert(END, "100")  # default value
+integration_step.insert(END, "0.01")  # default value
 integration_step.grid(row=2, column=6, padx=10)
 
 # simulation time
 Label(parameters_frame, text="Simulation time:").grid(row=1, column=7)
 simulation_time = Entry(parameters_frame, width=10)
-simulation_time.insert(END, "0.01")  # default value
+simulation_time.insert(END, "100")  # default value
 simulation_time.grid(row=2, column=7, padx=10)
 
 # start simulation
