@@ -63,30 +63,27 @@ def choose_signal(value):
 
 # Plots function
 def plotting(x, y, z, time):
-    figure_1 = Figure(figsize=(4, 2), dpi=120)
-    plot_1 = figure_1.add_subplot(111)
-    plot_1.set_title('Input and output signals u(t) and y(t)')
+    Label(plots_frame, text="Input, output and error signals", font=("Arial", 13)).grid(row=0, column=0)
+    fig = Figure()
+    fig, axes = plt.subplots(2)
 
-    plot_1.plot(time, x, color='C0')
-    plot_1.plot(time, y, color='C1')
+    axes[0].plot(time, x, 'r', label="u(t)")
+    axes[0].plot(time, y, 'g', label="y(t)")
+    axes[1].plot(time, z, color='b', label="e(t)")
 
-    chart_1 = FigureCanvasTkAgg(figure_1, master=plots_frame)
-    chart_1.get_tk_widget().grid(row=1, column=0)
+    axes[0].grid(visible=True)
+    axes[0].legend(loc='upper right')
+    axes[1].grid(visible=True)
+    axes[1].legend(loc='upper right')
+    axes[1].set_xlabel('Time')
 
-    figure_2 = Figure(figsize=(4, 2), dpi=120)
-    plot_2 = figure_2.add_subplot(111)
-    plot_2.set_title('Error signal e(t)')
+    fig.tight_layout()
 
-    plot_2.plot(time, z, color='C2')
-    plot_2.set_xlabel('Time')
+    chart = FigureCanvasTkAgg(fig, master=plots_frame)
+    chart.get_tk_widget().grid(row=1, column=0)
 
-    chart_2 = FigureCanvasTkAgg(figure_2, master=plots_frame)
-    chart_2.get_tk_widget().grid(row=2, column=0)
-
-    # toolbar = NavigationToolbar2Tk(chart, plots_frame)
-    # toolbar.pack()
-    # toolbar.update()
-
+    toolbar = NavigationToolbar2Tk(chart, plots_toolbar_frame)
+    toolbar.update()
 
 # Simulation function
 def simulation(zn_method):
@@ -94,6 +91,7 @@ def simulation(zn_method):
     t_stop = float(simulation_time.get())
     t_sample = float(integration_step.get())
     t = np.arange(0, t_stop, t_sample, dtype=np.float64)
+
     stability = True
 
     N = int(np.ceil(t_stop / t_sample))
@@ -163,6 +161,12 @@ def simulation(zn_method):
             e[i] = u[i] - y[i]
 
         # ----- Plotting -----
+        for widget in plots_toolbar_frame.winfo_children():
+            widget.destroy()
+
+        # for widget in plots_frame.winfo_children():
+        #     widget.destroy()
+
         plotting(u, y, e, t)
 
     else:
@@ -188,6 +192,9 @@ right_frame.pack(side=RIGHT, fill=BOTH, expand=True)
 
 plots_frame = Frame(right_frame)  # frame for plots
 plots_frame.pack()
+
+plots_toolbar_frame = Frame(right_frame)  # frame for toolbar (plots)
+plots_toolbar_frame.pack()
 
 img_frame = Frame(left_frame)  # frame for image
 img_frame.pack()
@@ -283,7 +290,5 @@ Button(start_sim_buttons_frame, text="Your parameters", pady=4, width=20,
 Button(start_sim_buttons_frame, text="Ziegler-Nichols parameters", pady=4, width=20,
        command=lambda: simulation(True)).grid(row=16, column=1, sticky=E)
 
-# Plotting
-Label(plots_frame, text="Plots", font=("Arial", 13)).grid(row=0, column=0)
 
 window.mainloop()
