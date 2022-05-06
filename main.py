@@ -85,6 +85,7 @@ def plotting(x, y, z, time):
     toolbar = NavigationToolbar2Tk(chart, plots_toolbar_frame)
     toolbar.update()
 
+
 # Simulation function
 def simulation(zn_method):
     # Simulation parameters
@@ -92,9 +93,8 @@ def simulation(zn_method):
     t_sample = float(integration_step.get())
     t = np.arange(0, t_stop, t_sample, dtype=np.float64)
 
-    stability = True
-
     N = int(np.ceil(t_stop / t_sample))
+    stability = True
 
     # System parameters
     a = float(a_parameter.get())
@@ -155,7 +155,10 @@ def simulation(zn_method):
             Bu = multiply_matrix_scalar(B, u[i])
             Cx = multiply_matrices(C, xi_1)
 
-            xi_1 = sum_matrices(xi_1, multiply_matrix_scalar(sum_matrices(Ax, Bu), t_sample))
+            xi = sum_matrices(Ax, Bu)
+            xi = multiply_matrix_scalar(xi, t_sample)
+            xi = sum_matrices(xi_1, xi)
+            xi_1 = xi
 
             y[i] = Cx[0][0]
             e[i] = u[i] - y[i]
@@ -172,9 +175,6 @@ def simulation(zn_method):
     else:
         messagebox.showinfo("Stability", "The control system is unstable, change parameters of PI regulator")
 
-
-# ----- Global Variables -----
-signal = "Square"
 
 # ----- GUI -----
 
@@ -260,6 +260,7 @@ integral_time.grid(row=7, column=1, sticky=W)
 
 # Input signals
 var = IntVar()
+signal = "Square"  # default value
 Label(input_signal_frame, text="Choose input signal", font=("Arial", 13)).grid(row=8, column=0)
 Radiobutton(input_signal_frame, text="Square wave", variable=var, value=0,
             command=lambda: choose_signal(0)).grid(row=9, column=0, sticky=W)
