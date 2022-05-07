@@ -62,8 +62,8 @@ def choose_signal(value):
 
 
 # Plots function
-def plotting(x, y, z, time):
-    Label(plots_frame, text="Input, output and error signals", font=("Arial", 13)).grid(row=0, column=0)
+def plotting(x, y, z, time, info):
+    Label(plots_frame, text=info, font=("Arial", 13)).grid(row=0, column=0)
     fig = Figure()
     fig, axes = plt.subplots(2)
 
@@ -109,6 +109,8 @@ def simulation(zn_method):
         T = 0.85 * T_osc
     elif (2 * a ** 3) < k or (2 * k * a ** 3 - k ** 2 - (2 * a * k) / T) < 0:  # stability test
         stability = False
+
+    info = f"Input, output and error signals \n Parameters: k = {round(k,1)}, T = {round(T,1)}"
 
     # Input signals parameters
     amp = float(amplitude.get())
@@ -170,7 +172,7 @@ def simulation(zn_method):
         # for widget in plots_frame.winfo_children():
         #     widget.destroy()
 
-        plotting(u, y, e, t)
+        plotting(u, y, e, t, info)
 
     else:
         messagebox.showinfo("Stability", "The control system is unstable, change parameters of PI regulator")
