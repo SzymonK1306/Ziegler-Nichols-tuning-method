@@ -107,10 +107,10 @@ def simulation(zn_method):
         T_osc = 2 * np.pi / a
         k = 0.45 * k_max
         T = 0.85 * T_osc
-    elif (2 * a ** 3) < k or (2 * k * a ** 3 - k ** 2 - (2 * a * k) / T) < 0:  # stability test
+    elif (2 * a ** 3) <= k or (2 * k * a ** 3 - k ** 2 - (4 * a ** 2 * k) / T) <= 0:  # stability test
         stability = False
 
-    info = f"Input, output and error signals \n Parameters: k = {round(k,1)}, T = {round(T,1)}"
+    info = f"Input, output and error signals \n Parameters: k = {round(k,2)}, T = {round(T,2)}"
 
     # Input signals parameters
     amp = float(amplitude.get())
@@ -236,7 +236,7 @@ simulation_time.grid(row=2, column=1, sticky=W)
 # integration step
 Label(sim_param_frame, text="Integration step: ").grid(row=3, column=0)
 integration_step = Entry(sim_param_frame, width=10)
-integration_step.insert(END, "0.01")  # default value
+integration_step.insert(END, "0.001")  # default value
 integration_step.grid(row=3, column=1, sticky=W)
 
 # System parameters
