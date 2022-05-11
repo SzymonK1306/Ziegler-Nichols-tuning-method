@@ -94,12 +94,17 @@ def simulation(zn_method):
     t = np.arange(0, t_stop, t_sample, dtype=np.float64)
 
     N = int(np.ceil(t_stop / t_sample))
+
     stability = True
+    positive_coefficients = True
 
     # System parameters
     a = float(a_parameter.get())
     k = float(gain_k.get())
     T = float(integral_time.get())
+
+    if a <= 0 or k <= 0 or T <= 0:
+        positive_coefficients = False
 
     # PI parameters using Z-N method
     if zn_method:
@@ -143,7 +148,7 @@ def simulation(zn_method):
         u = [amp * np.sin(2 * np.pi * freq * i * t_sample) for i in range(N)]
 
     # Simulation
-    if stability:
+    if stability and positive_coefficients:
         y = [0 for i in range(N)]  # Output signal initialization
         e = [0 for i in range(N)]  # Error signal initialization
 
@@ -174,8 +179,10 @@ def simulation(zn_method):
 
         plotting(u, y, e, t, info)
 
+    elif not positive_coefficients:
+        messagebox.showinfo("Stability", "Error! \nAll system parameters must have positive values")
     else:
-        messagebox.showinfo("Stability", "The control system is unstable, change parameters of PI regulator")
+        messagebox.showinfo("Stability", "Error! \nThe control system is unstable, change parameters of PI regulator")
 
 
 # ----- GUI -----
@@ -245,13 +252,13 @@ Label(syst_param_frame, text="Enter system parameters", font=("Arial", 13)).grid
 # parameter 'a'
 Label(syst_param_frame, text="Parameter 'a': ").grid(row=5, column=0, sticky=W)
 a_parameter = Entry(syst_param_frame, width=10)
-a_parameter.insert(END, "2")  # default value
+a_parameter.insert(END, "4")  # default value
 a_parameter.grid(row=5, column=1, sticky=W)
 
 # gain 'k'
 Label(syst_param_frame, text="Gain 'k': ").grid(row=6, column=0, sticky=W)
 gain_k = Entry(syst_param_frame, width=10)
-gain_k.insert(END, "10")  # default value
+gain_k.insert(END, "13")  # default value
 gain_k.grid(row=6, column=1, sticky=W)
 
 # integral time 'T'
@@ -283,7 +290,7 @@ amplitude.grid(row=13, column=1, sticky=W)
 # frequency
 Label(input_param_frame, text="Frequency: ").grid(row=14, column=0, sticky=W)
 frequency = Entry(input_param_frame, width=10)
-frequency.insert(END, "0.1")  # default value
+frequency.insert(END, "0.02")  # default value
 frequency.grid(row=14, column=1, sticky=W)
 
 # Start simulation
