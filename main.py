@@ -1,6 +1,6 @@
 from tkinter import *  # lib for GUI
-from PIL import ImageTk, Image
 from tkinter import messagebox
+from PIL import ImageTk, Image
 from matplotlib import pyplot as plt  # lib for plots
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -69,12 +69,16 @@ def plotting(x, y, z, time, info):
 
     axes[0].plot(time, x, 'r', label="u(t)")
     axes[0].plot(time, y, 'g', label="y(t)")
-    axes[1].plot(time, z, color='b', label="e(t)")
+    axes[1].plot(time, z, 'b', label="e(t)")
 
     axes[0].grid(visible=True)
     axes[0].legend(loc='upper right')
+    axes[0].set_xlim(left=0, right=time[-1])
+
     axes[1].grid(visible=True)
     axes[1].legend(loc='upper right')
+    axes[1].set_xlim(left=0, right=time[-1])
+
     axes[1].set_xlabel('Time')
 
     fig.tight_layout()
@@ -143,7 +147,7 @@ def simulation(zn_method):
     if signal == "Heaviside":
         u = [amp for i in range(N)]
     elif signal == "Square":
-        u = [amp * np.sign(np.sin(2 * np.pi * freq * i * t_sample)) for i in range(N)]  # ! Need to edit
+        u = [amp * np.sign(np.sin(2 * np.pi * freq * i * t_sample)) for i in range(N)]
     elif signal == "Sine":
         u = [amp * np.sin(2 * np.pi * freq * i * t_sample) for i in range(N)]
 
@@ -173,9 +177,6 @@ def simulation(zn_method):
         # ----- Plotting -----
         for widget in plots_toolbar_frame.winfo_children():
             widget.destroy()
-
-        # for widget in plots_frame.winfo_children():
-        #     widget.destroy()
 
         plotting(u, y, e, t, info)
 
