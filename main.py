@@ -112,7 +112,7 @@ def simulation(zn_method):
         T_osc = 2 * np.pi / a
         k = 0.45 * k_max
         T = 0.85 * T_osc
-    elif (2 * a ** 3) <= k or (2 * k * a ** 3 - k ** 2 - (4 * a ** 2 * k) / T) <= 0:  # stability test
+    elif (2 * k * a ** 3 - k ** 2 - (4 * a ** 2 * k) / T) <= 0:  # stability test
         stability = False
 
     info = f"Input, output and error signals \n Parameters: k = {round(k,2)}, T = {round(T,2)}"
