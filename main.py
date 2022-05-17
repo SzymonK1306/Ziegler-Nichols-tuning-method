@@ -190,7 +190,6 @@ def simulation(zn_method):
 
 # Creating a window
 window = Tk()
-window.geometry("1100x550")
 window.title("Ziegler–Nichols tuning method")
 
 # Creating frames
