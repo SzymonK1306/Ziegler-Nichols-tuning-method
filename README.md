@@ -8,7 +8,7 @@ Our project allows you to **model** and **simulate** a given automatic control s
 The project was implemented with *Python 3.9 (PyCharm 2021.3.2)* using the following libraries: **tkinter** and **PIL** (for GUI), **matplotlib** (for plots) and **NumPy** (for performing some mathematical functions).
 
 ### 📷 Screenshots
-**Simulations with calculated Ziegler-Nichols parameters:**
+**Example simulations with calculated Ziegler-Nichols parameters:**
 - ```a = 4``` | Heaviside step function
 <img src="/_readmeImg/1-step.png?raw=true 'Simulation I'" width="600">
 
@@ -18,7 +18,7 @@ The project was implemented with *Python 3.9 (PyCharm 2021.3.2)* using the follo
 - ```a = 4``` | Sine function
 <img src="/_readmeImg/1-sine.png?raw=true 'Simulation III'" width="600">
 
-**Simulations with own parameters:**
+**Example simulations with own parameters:**
 - ```a = 4, k = 13, T = 4``` | Heaviside step function
 <img src="/_readmeImg/2-step.png?raw=true 'Simulation I'" width="600">
 
